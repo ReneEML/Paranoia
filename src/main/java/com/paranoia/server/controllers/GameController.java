@@ -1,0 +1,75 @@
+package com.paranoia.server.controllers;
+
+import com.paranoia.server.controllers.dto.ConnectRequest;
+import com.paranoia.server.controllers.dto.ShowRequest;
+import com.paranoia.server.controllers.dto.StartRequest;
+import com.paranoia.server.exception.InvalidGameException;
+import com.paranoia.server.exception.InvalidParamException;
+import com.paranoia.server.exception.InvalidPhaseException;
+import com.paranoia.server.model.*;
+import com.paranoia.server.service.GameService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/game")
+public class GameController {
+    private final Logger logger;
+    private final GameService gameService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public GameController(GameService gameService, SimpMessagingTemplate simpMessagingTemplate) {
+        this.gameService = gameService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.logger = LoggerFactory.getLogger(GameController.class);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Game> create(@RequestBody Player player){
+        logger.info("Start game request: {}", player);
+        return ResponseEntity.ok(gameService.createGame(player));
+    }
+
+    @PostMapping("/connect")
+    public ResponseEntity<Game> connect(@RequestBody ConnectRequest connectRequest)
+            throws InvalidParamException, InvalidGameException {
+        logger.info("Connect to game request: {}", connectRequest);
+        return ResponseEntity.ok(gameService.connectToGame(connectRequest.getPlayer(), connectRequest.getGameId()));
+    }
+
+    @PostMapping("/start")
+    public ResponseEntity<Game> start(@RequestBody StartRequest request) throws InvalidParamException {
+        logger.info("Starting game: {}", request);
+        return ResponseEntity.ok(gameService.startGame(request.getGameId()));
+    }
+
+    @PostMapping("/ask")
+    public ResponseEntity<Game> ask(@RequestBody Question request) throws InvalidGameException, InvalidPhaseException {
+        logger.info("Ask: {}", request);
+        Game game = gameService.askQuestion(request);
+        simpMessagingTemplate.convertAndSend("/topic/game-progress/" +game.getGameId(), game);
+        return ResponseEntity.ok(game);
+    }
+
+    @PostMapping("/answer")
+    public ResponseEntity<Game> answer(@RequestBody Answer request) throws InvalidGameException, InvalidPhaseException {
+        logger.info("Answer: {}", request);
+        Game game = gameService.answerQuestion(request);
+        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
+        return ResponseEntity.ok(game);
+    }
+
+    @PostMapping("/show")
+    public ResponseEntity<Game> show(@RequestBody ShowRequest request) throws InvalidGameException, InvalidPhaseException {
+        logger.info("Show: {}", request);
+        Game game = gameService.showAnswer(request.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
+        return ResponseEntity.ok(game);
+    }
+}
