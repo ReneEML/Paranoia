@@ -1,7 +1,8 @@
-import React from 'react'
-import Home from './Home'
-import Lobby from './Lobby'
-import JoiningLobby from './JoiningLobby'
+import React from 'react';
+import Home from './Home';
+import Lobby from './Lobby';
+import JoiningLobby from './JoiningLobby';
+import GamePlay from './GamePlay';
 import {
     BrowserRouter as Router,
     Switch,
@@ -20,6 +21,9 @@ const Routing = () => {
                 </Route>
                 <Route path="/lobby">
                     <Lobby />
+                </Route>
+                <Route path="/game">
+                    <GamePlay />
                 </Route>
                 <Route path="/">
                     <Home />
