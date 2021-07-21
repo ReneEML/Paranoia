@@ -10,37 +10,36 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../styles/home.css';
 import { Box } from '@material-ui/core';
+import { useHistory } from "react-router";
 
 
 const Lobby = () => {
+    const history = useHistory();
     const [isLoading, setIsLoading] = useState(true);
     const [gameId, setGameId] = useState('');
     const [players, setPlayers] = useState({});
-    const createUrl = "http://localhost:8080/game/create";
-    const createGame = async (url = '', data = {}) => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }
-        const response = await fetch(url, requestOptions)
-        .then(res => res.json())
-        .then(res => {
-            setPlayers(res.players.map(x => x.login));
-            setGameId(res.gameId);
-            setIsLoading(false);
-        });
-    }
-    const classes = makeStyles();
-    useEffect(() => {
-        const data = {
-            login: "Abdulla",
-            type: 2
-        }
-        createGame(createUrl, data);
 
-        
-    }, [])
+    const startHandler = () => {
+        history.push('/game');
+    }
+    const leaveHandler = () => {
+        history.push('/');
+    }
+
+    useEffect(() => {
+        setPlayers([
+            "joe",
+            "mama",
+            "ligma",
+            "sigma",
+            "sugandese",
+            "melone brown",
+            "omlette",
+            "candice"
+        ]);
+        setIsLoading(false);
+    }
+        , [])
     return (
         <div className="homepage" >
             <Box width="50%">
@@ -49,7 +48,7 @@ const Lobby = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="center">Players - {gameId}</TableCell>
+                                    <TableCell align="center">Players</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -67,8 +66,8 @@ const Lobby = () => {
                     </>
                 }
             </Box>
-            <LinkButton name="start" path="/game" />
-            <LinkButton name="leave" path="/" />
+            <LinkButton name="start" onClickHandler={startHandler} />
+            <LinkButton name="leave" onClickHandler={leaveHandler} />
         </div>
     );
 }
