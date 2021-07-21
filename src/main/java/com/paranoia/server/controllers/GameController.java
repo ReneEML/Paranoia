@@ -12,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/game")
@@ -30,12 +27,14 @@ public class GameController {
         this.logger = LoggerFactory.getLogger(GameController.class);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/create")
     public ResponseEntity<Game> create(@RequestBody Player player){
         logger.info("Start game request: {}", player);
         return ResponseEntity.ok(gameService.createGame(player));
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/connect")
     public ResponseEntity<Game> connect(@RequestBody ConnectRequest connectRequest)
             throws InvalidParamException, InvalidGameException {
@@ -43,12 +42,14 @@ public class GameController {
         return ResponseEntity.ok(gameService.connectToGame(connectRequest.getPlayer(), connectRequest.getGameId()));
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/start")
     public ResponseEntity<Game> start(@RequestBody StartRequest request) throws InvalidParamException {
         logger.info("Starting game: {}", request);
         return ResponseEntity.ok(gameService.startGame(request.getGameId()));
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/ask")
     public ResponseEntity<Game> ask(@RequestBody Question request) throws InvalidGameException, InvalidPhaseException {
         logger.info("Ask: {}", request);
@@ -57,6 +58,7 @@ public class GameController {
         return ResponseEntity.ok(game);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/answer")
     public ResponseEntity<Game> answer(@RequestBody Answer request) throws InvalidGameException, InvalidPhaseException {
         logger.info("Answer: {}", request);
@@ -65,6 +67,7 @@ public class GameController {
         return ResponseEntity.ok(game);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/show")
     public ResponseEntity<Game> show(@RequestBody ShowRequest request) throws InvalidGameException, InvalidPhaseException {
         logger.info("Show: {}", request);

@@ -22,7 +22,12 @@ public class GameService {
             throw new InvalidParamException("Game with provKided id:" + gameId + "dosen't exist");
         }
         Game game = GameStorage.getInstance().getGames().get(gameId);
-
+        if(game.getStatus() == GameStatus.IN_PROGRESS) {
+            throw new InvalidGameException("Game is already started");
+        }
+        if(game.getStatus() == GameStatus.FINISHED) {
+            throw new InvalidGameException("Game is finished");
+        }
         if(game.getPlayers().size() >= 15){
             throw new InvalidGameException("Game is full");
         }
