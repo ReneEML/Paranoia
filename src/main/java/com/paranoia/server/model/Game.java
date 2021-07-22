@@ -18,7 +18,7 @@ public class Game {
     private int currentAsker;
 
     public Game(Player player) {
-        this.players = new ArrayList<Player>();
+        this.players = new ArrayList<>();
         this.host = player;
         this.players.add(player);
         this.status = GameStatus.NEW;
@@ -29,9 +29,9 @@ public class Game {
         players.add(player);
     }
 
-    public void removePlayer(String login){
+    public void removePlayer(String name){
         for(Player x: players) {
-            if (x.getLogin() == login) {
+            if (x.getPlayerName().equals(name)) {
                 players.remove(x);
                 break;
             }
@@ -44,7 +44,7 @@ public class Game {
             currentAsker = 0;
         }
         Asker = players.get(currentAsker);
-        int questionIndex = 0;
+        int questionIndex;
         do{
             questionIndex = ThreadLocalRandom.current().nextInt(0, players.size());
         }while(questionIndex == currentAsker);

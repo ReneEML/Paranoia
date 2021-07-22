@@ -1,65 +1,68 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { TextField } from '@material-ui/core';
+import Stomp from "stompjs";
+import LinkButton from './LinkButton';
+import {
+    selectGameId,
+    selectUserName,
+    se
+} from '../reducers/userSlice'
+
+import SockJs from 'sockjs-client'
 
 const GamePlay = () => {
-    const [phase, setPhase] = useState("");
-    const [type, setType] = useState("");
-    const [show, setShow] = useState(false);
+    const [stompClient, setStompClient] = useState(null);
+    const [gameId, setGameId] = useState("");
+    const [game, setGame] = useState({});
+    const url = "http://localhost:8080";
 
-    const askPhase = () => {
-        if (type === "ASKER") {
-            return (
-                <div>
-                    <p>enter question</p>
-                </div>
-            );
-        }
-        return (
-            <div>
-                <p>Player x is asking a question</p>
-            </div>
-        );
+    const connectToSocket = () => {
+        const socket = new SockJs(`http://localhost:8080/paranoia`);
+        let stomp = Stomp.over(socket);
+        stomp.connect({}, (frame) => {
+            console.log("connected " + frame);
+            console.log(gameId);
+            let endpoint = '/topic/gameplay/' + gameId;
+            stomp.subscribe(endpoint, (response) =>{
+                console.log(JSON.parse(response.body).content);
+            });
+        })
+        setStompClient(stomp);
+        
     }
 
-    const answerPhase = () => {
-        if (type === "QUESTION") {
-            return (
-                <div>
-                    <p>answer question</p>
-                </div>
-            );
+    useEffect(() => {
+        setGameId("84dea7e5-9847-42e4-b8d8-bbccd5604176")
+        connectToSocket();
+    }, [])
+    const askQuestion = () => {
+        const data = {
+            question: "Who is the best at calisthenics?",
+            gameId: gameId
         }
-        return (
-            <div>
-                <p>Player x is answering a question</p>
-            </div>
-        );
+        stompClient.send("/app/ask",{}, JSON.stringify(data))
     }
 
-    const showPhase = () => {
-        return (<div>
-            {show ?
-                <p>Showing question</p>
-                :
-                <p>Not showing question</p>
-            }
-        </div>)
+    const answerQuestion = () => {
+        const data = {
+            answer: "Abdulla :)",
+            gameId: gameId
+        }
+        stompClient.send("/app/answer",{}, JSON.stringify(data))
     }
 
-    const displayPhase = () => {
-        if (phase === "ASK") {
-            return askPhase();
+    const showQuestion = () => {
+        const data = {
+            gameId: gameId
         }
-        else if (phase === "ANSWER") {
-            return answerPhase();
-        }
-        else if (phase === "SHOW") {
-            return showPhase();
-        }
-        return <div>Error not in any specified game phase</div>
+        stompClient.send("/app/show",{}, JSON.stringify(data))
     }
     return (
         <div>
-            {displayPhase()}
+            <LinkButton name="ask" onClickHandler={askQuestion} />
+            <LinkButton name ="answer" onClickHandler={answerQuestion} />
+            <LinkButton name ="show" onClickHandler={showQuestion} />
         </div>
     );
 }

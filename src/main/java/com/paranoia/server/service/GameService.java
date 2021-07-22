@@ -36,16 +36,26 @@ public class GameService {
         return game;
     }
 
-    public Game startGame(String gameId) throws InvalidParamException {
-        if(!GameStorage.getInstance().getGames().containsKey(gameId)){
+    public Game startGame(String gameId) throws InvalidParamException, InvalidGameException {
+        if(!GameStorage.getInstance().getGames().containsKey(gameId)) {
             throw new InvalidParamException("Game with provided id:" + gameId + "dosen't exist");
         }
         Game game = GameStorage.getInstance().getGames().get(gameId);
+        if(game.getPlayers().size() < 2){
+            throw new InvalidGameException("Need at least 2 players to start the game");
+        }
         game.setStatus(GameStatus.IN_PROGRESS);
         game.setPhase(RoundPhase.ASK);
         game.startRound();
         GameStorage.getInstance().setGame(game);
         return game;
+    }
+
+    public Game getGameState(String gameId) throws InvalidParamException {
+        if(!GameStorage.getInstance().getGames().containsKey(gameId)){
+            throw new InvalidParamException("Game with provided id:" + gameId + "dosen't exist");
+        }
+        return GameStorage.getInstance().getGames().get(gameId);
     }
 
     public Game askQuestion(Question question) throws InvalidGameException, InvalidPhaseException {
