@@ -31,7 +31,7 @@ public class GameController {
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/create")
     public ResponseEntity<Game> create(@RequestBody Player player){
-        logger.info("Start game request: {}", player);
+        logger.info("Create game request: {}", player);
         return ResponseEntity.ok(gameService.createGame(player));
     }
 

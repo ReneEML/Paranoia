@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import LinkButton from './LinkButton'
-import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -11,12 +10,18 @@ import Paper from '@material-ui/core/Paper';
 import '../styles/home.css';
 import { Box } from '@material-ui/core';
 import { useHistory } from "react-router";
-
+import {
+    selectGameId,
+    selectPlayerName,
+} from '../reducers/playerSlice';
+import { useSelector } from 'react-redux';
+import { POST } from '../app/requests';
 
 const Lobby = () => {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(true);
-    const [gameId, setGameId] = useState('');
+    const gameId = useSelector(selectGameId);
+    const playerName = useSelector(selectPlayerName);
     const [players, setPlayers] = useState({});
 
     const startHandler = () => {
@@ -27,21 +32,19 @@ const Lobby = () => {
     }
 
     useEffect(() => {
-        setPlayers([
-            "joe",
-            "mama",
-            "ligma",
-            "sigma",
-            "sugandese",
-            "melone brown",
-            "omlette",
-            "candice"
-        ]);
-        setIsLoading(false);
+        POST('/game/get', {gameId: gameId}).then(response => {
+            if(response !== undefined && response) {
+                setPlayers(response.players.map(x => x.playerName));
+                setIsLoading(false);
+            }
+        });
+        
     }
-        , [])
+        , [gameId])
     return (
         <div className="homepage" >
+            <h>Name: {playerName}</h>
+            <h>GameId: {gameId}</h>
             <Box width="50%">
                 {!isLoading ?
                     <TableContainer component={Paper} width="600">

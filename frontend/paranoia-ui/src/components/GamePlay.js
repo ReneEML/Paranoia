@@ -1,47 +1,65 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { TextField } from '@material-ui/core';
+import { useSelector } from 'react-redux';
 import Stomp from "stompjs";
 import LinkButton from './LinkButton';
+import { URL } from '../app/constants';
 import {
     selectGameId,
-    selectUserName,
-    se
-} from '../reducers/userSlice'
-
-import SockJs from 'sockjs-client'
+    selectPlayerName,
+} from '../reducers/playerSlice';
+import SockJs from 'sockjs-client';
+import { POST } from '../app/requests';
 
 const GamePlay = () => {
+    const gameId = useSelector(selectGameId);
+    const name = useSelector(selectPlayerName);
     const [stompClient, setStompClient] = useState(null);
-    const [gameId, setGameId] = useState("");
-    const [game, setGame] = useState({});
-    const url = "http://localhost:8080";
+    const [players, setPlayers] = useState([]);
+    const [phase, setPhase] = useState("");
+    const [question, setQuestion] = useState("");
+    const [answer, setAnswer] = useState("");
+    const [show, setShow] = useState(false);
 
     const connectToSocket = () => {
-        const socket = new SockJs(`http://localhost:8080/paranoia`);
+        let socketEndpoint = URL + '/paranoia';
+        const socket = new SockJs(socketEndpoint);
         let stomp = Stomp.over(socket);
         stomp.connect({}, (frame) => {
             console.log("connected " + frame);
             console.log(gameId);
             let endpoint = '/topic/gameplay/' + gameId;
-            stomp.subscribe(endpoint, (response) =>{
-                console.log(JSON.parse(response.body).content);
+            stomp.subscribe(endpoint, (response) => {
+                let json = JSON.parse(response.body);
+                setPlayers(json.players);
+                setPhase(json.phase);
+                setAnswer(json.answer);
+                setQuestion(json.question);
+                setShow(json.showAnswer);
             });
         })
         setStompClient(stomp);
-        
+
     }
 
     useEffect(() => {
-        setGameId("84dea7e5-9847-42e4-b8d8-bbccd5604176")
         connectToSocket();
+        let gameData = POST('/game/get', { gameId: gameId }).then(data => {
+            if(data && data !== undefined){
+                setPlayers(data.players);
+                setPhase(data.phase);
+                setAnswer(data.answer);
+                setQuestion(data.question);
+                setShow(data.showAnswer);
+            }
+        });
+
     }, [])
     const askQuestion = () => {
         const data = {
             question: "Who is the best at calisthenics?",
             gameId: gameId
         }
-        stompClient.send("/app/ask",{}, JSON.stringify(data))
+        stompClient.send("/app/ask", {}, JSON.stringify(data))
     }
 
     const answerQuestion = () => {
@@ -49,20 +67,28 @@ const GamePlay = () => {
             answer: "Abdulla :)",
             gameId: gameId
         }
-        stompClient.send("/app/answer",{}, JSON.stringify(data))
+        stompClient.send("/app/answer", {}, JSON.stringify(data))
     }
 
     const showQuestion = () => {
         const data = {
             gameId: gameId
         }
-        stompClient.send("/app/show",{}, JSON.stringify(data))
+        stompClient.send("/app/show", {}, JSON.stringify(data))
     }
     return (
         <div>
-            <LinkButton name="ask" onClickHandler={askQuestion} />
-            <LinkButton name ="answer" onClickHandler={answerQuestion} />
-            <LinkButton name ="show" onClickHandler={showQuestion} />
+            <p>Game: {gameId}</p>
+            <p>Username: {name}</p>
+            <p>phase: {phase}</p>
+            <p>question: {question}</p>
+            <p>answer: {answer}</p>
+            <p>show: {show.toString()}</p>
+
+            {phase === "ASK" ? <LinkButton name="ask" onClickHandler={askQuestion} /> : <></>}
+            {phase === "ANSWER" ?  <LinkButton name="answer" onClickHandler={answerQuestion} /> : <></>}
+            {phase === "SHOW" ? <LinkButton name="show" onClickHandler={showQuestion} /> : <></>}
+            {players.map(x => <p>{x.playerName}</p>)}
         </div>
     );
 }
