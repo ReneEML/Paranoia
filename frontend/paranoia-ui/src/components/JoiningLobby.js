@@ -5,6 +5,7 @@ import { useHistory } from "react-router";
 import { useDispatch, useSelector } from 'react-redux';
 import {
     joinGame,
+    createGame,
     selectLoading
 
 } from '../reducers/playerSlice';
@@ -24,11 +25,7 @@ const JoiningLobby = ({ isCreate }) => {
             playerType: 0
         };
         
-        dispatch(joinGame({
-            endpoint: '/game/create',
-            data: data
-        }
-        ));
+        dispatch(createGame(data));
         history.push("/lobby");
 
     }
@@ -41,7 +38,7 @@ const JoiningLobby = ({ isCreate }) => {
             },
             gameId: gameId,
         };
-        dispatch(joinGame('/game/connect', data));
+        dispatch(joinGame(data));
         history.push("/lobby");
 
     }

@@ -8,11 +8,11 @@ public class Game {
     private Player host;
     private ArrayList<Player> players;
     private String gameId;
-    private Player Asker;
-    private Player Questioned;
+    private Player asker;
+    private Player questioned;
     private GameStatus status;
-    private String Question;
-    private String Answer;
+    private String question;
+    private String answer;
     private RoundPhase phase;
     private boolean showAnswer;
     private int currentAsker;
@@ -43,12 +43,12 @@ public class Game {
         if(currentAsker >= players.size()){
             currentAsker = 0;
         }
-        Asker = players.get(currentAsker);
+        asker = players.get(currentAsker);
         int questionIndex;
         do{
             questionIndex = ThreadLocalRandom.current().nextInt(0, players.size());
         }while(questionIndex == currentAsker);
-        Questioned = players.get(questionIndex);
+        questioned = players.get(questionIndex);
     }
 
     public ArrayList<Player> getPlayers() {
@@ -60,7 +60,7 @@ public class Game {
     }
 
     public Player getAsker() {
-        return Asker;
+        return asker;
     }
 
     public Player getHost() {
@@ -68,11 +68,11 @@ public class Game {
     }
 
     public Player getQuestioned() {
-        return Questioned;
+        return questioned;
     }
 
     public String getAnswer() {
-        return Answer;
+        return answer;
     }
 
     public String getGameId() {
@@ -80,19 +80,17 @@ public class Game {
     }
 
     public String getQuestion() {
-        return Question;
+        return question;
     }
 
     public void setQuestioned(Player questioned) {
-        Questioned = questioned;
     }
 
     public void setAnswer(String answer) {
-        Answer = answer;
+        this.answer = answer;
     }
 
     public void setAsker(Player asker) {
-        Asker = asker;
     }
 
     public void setGameId(String gameId) {
@@ -108,7 +106,7 @@ public class Game {
     }
 
     public void setQuestion(String question) {
-        Question = question;
+        this.question = question;
     }
 
     public void setStatus(GameStatus status) {

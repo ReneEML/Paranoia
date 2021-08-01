@@ -40,14 +40,17 @@ public class GameController {
     public ResponseEntity<Game> connect(@RequestBody ConnectRequest connectRequest)
             throws InvalidParamException, InvalidGameException {
         logger.info("Connect to game request: {}", connectRequest);
-        return ResponseEntity.ok(gameService.connectToGame(connectRequest.getPlayer(), connectRequest.getGameId()));
+        Game game = gameService.connectToGame(connectRequest.getPlayer(), connectRequest.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/players/" + game.getGameId(), game);
+        return ResponseEntity.ok(game);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/start")
-    public ResponseEntity<Game> start(@RequestBody StartRequest request) throws InvalidParamException, InvalidGameException {
+    public void start(@RequestBody StartRequest request) throws InvalidParamException, InvalidGameException {
         logger.info("Starting game: {}", request);
-        return ResponseEntity.ok(gameService.startGame(request.getGameId()));
+        Game game = gameService.startGame(request.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/start/" +game.getGameId(), game);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")

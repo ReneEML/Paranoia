@@ -2,18 +2,27 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { POST } from '../app/requests';
 
 
-export const joinGame = createAsyncThunk(
+export const createGame = createAsyncThunk(
     'player/joinGame',
-    async (request, thunkAPI) => {
-        const { endpoint, data } = request;
-        const response = await POST(endpoint, data);
-        console.log(response);
+    async (data, thunkAPI) => {
+        const response = await POST('/game/create', data);
         return {
             gameId: response.gameId,
             playerName: data.playerName
         };
     }
-)
+);
+
+export const joinGame = createAsyncThunk(
+    'player/createGame',
+    async (data, thunkAPI) => {
+        const response = await POST('/game/connect', data);
+        return {
+            gameId: response.gameId,
+            playerName: data.player.playerName
+        };
+    }
+);
 
 export const playerSlice = createSlice({
     name: 'player',
@@ -40,13 +49,22 @@ export const playerSlice = createSlice({
     },
     extraReducers: {
         [joinGame.pending]: (state) => {
-            state.loading = 'LOADING';
+            state.loading = 'LOADING'
         },
         [joinGame.fulfilled]: (state, { payload }) => {
             state.gameId = payload.gameId
             state.playerName = payload.playerName
-            state.loading = 'FULFILLED';
-        }
+            state.loading = 'FULFILLED'
+        },
+        [createGame.pending]: (state) => {
+            state.loading = 'LOADING'
+        },
+        [createGame.fulfilled]: (state, { payload }) => {
+            state.gameId = payload.gameId
+            state.playerName = payload.playerName
+            state.loading = 'FULFILLED'
+
+        },
     }
 
 });

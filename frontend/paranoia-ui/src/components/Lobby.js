@@ -14,8 +14,11 @@ import {
     selectGameId,
     selectPlayerName,
 } from '../reducers/playerSlice';
+import { URL } from '../app/constants';
 import { useSelector } from 'react-redux';
 import { POST } from '../app/requests';
+import Stomp from "stompjs";
+import SockJs from 'sockjs-client';
 
 const Lobby = () => {
     const history = useHistory();
@@ -24,21 +27,44 @@ const Lobby = () => {
     const playerName = useSelector(selectPlayerName);
     const [players, setPlayers] = useState({});
 
+    const connectToSocket = () => {
+        let socketEndpoint = URL + '/paranoia';
+        const socket = new SockJs(socketEndpoint);
+        let stomp = Stomp.over(socket);
+        stomp.connect({}, (frame) => {
+            let start = '/topic/start/' + gameId;
+            let player = '/topic/players/' + gameId;
+            stomp.subscribe(start, () => history.push('/game'));
+            stomp.subscribe(player, (response) => {
+                let json = JSON.parse(response.body);
+                if (json !== undefined && json.players !== undefined) {
+                    setPlayers(json.players);
+                }
+            });
+        });
+
+    }
+
     const startHandler = () => {
-        history.push('/game');
+        POST('/game/start', { gameId: gameId })
+            .then(history.push('/game'))
+            .catch((e) => console.log(e));
     }
     const leaveHandler = () => {
         history.push('/');
     }
 
     useEffect(() => {
-        POST('/game/get', {gameId: gameId}).then(response => {
-            if(response !== undefined && response) {
-                setPlayers(response.players.map(x => x.playerName));
-                setIsLoading(false);
-            }
-        });
-        
+        if (gameId && gameId !== undefined) {
+            POST('/game/get', { gameId: gameId }).then(response => {
+                if (response !== undefined && response.players !== undefined) {
+                    console.log(response.players);
+                    setPlayers(response.players);
+                    setIsLoading(false);
+                }
+            });
+            connectToSocket();
+        }
     }
         , [gameId])
     return (
@@ -57,7 +83,7 @@ const Lobby = () => {
                             <TableBody>
                                 {players.map((row) => (
                                     <TableRow>
-                                        <TableCell align="center">{row}</TableCell>
+                                        <TableCell align="center">{row.playerName}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

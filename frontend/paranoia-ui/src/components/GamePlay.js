@@ -19,22 +19,24 @@ const GamePlay = () => {
     const [question, setQuestion] = useState("");
     const [answer, setAnswer] = useState("");
     const [show, setShow] = useState(false);
+    const [asker, setAsker] = useState("");
+    const [questioned, setQuestioned] = useState("");
 
     const connectToSocket = () => {
         let socketEndpoint = URL + '/paranoia';
         const socket = new SockJs(socketEndpoint);
         let stomp = Stomp.over(socket);
         stomp.connect({}, (frame) => {
-            console.log("connected " + frame);
-            console.log(gameId);
             let endpoint = '/topic/gameplay/' + gameId;
             stomp.subscribe(endpoint, (response) => {
-                let json = JSON.parse(response.body);
-                setPlayers(json.players);
-                setPhase(json.phase);
-                setAnswer(json.answer);
-                setQuestion(json.question);
-                setShow(json.showAnswer);
+                let data = JSON.parse(response.body);
+                setPlayers(data.players);
+                setPhase(data.phase);
+                setAnswer(data.answer);
+                setQuestion(data.question);
+                setShow(data.showAnswer);
+                setAsker(data.asker.playerName);
+                setQuestioned(data.questioned.playerName);
             });
         })
         setStompClient(stomp);
@@ -43,13 +45,15 @@ const GamePlay = () => {
 
     useEffect(() => {
         connectToSocket();
-        let gameData = POST('/game/get', { gameId: gameId }).then(data => {
+        POST('/game/get', { gameId: gameId }).then(data => {
             if(data && data !== undefined){
                 setPlayers(data.players);
                 setPhase(data.phase);
                 setAnswer(data.answer);
                 setQuestion(data.question);
                 setShow(data.showAnswer);
+                setAsker(data.asker.playerName);
+                setQuestioned(data.questioned.playerName);
             }
         });
 
@@ -76,6 +80,7 @@ const GamePlay = () => {
         }
         stompClient.send("/app/show", {}, JSON.stringify(data))
     }
+
     return (
         <div>
             <p>Game: {gameId}</p>
@@ -84,6 +89,8 @@ const GamePlay = () => {
             <p>question: {question}</p>
             <p>answer: {answer}</p>
             <p>show: {show.toString()}</p>
+            <p>questioned: {questioned}</p>
+            <p>asker: {asker}</p>
 
             {phase === "ASK" ? <LinkButton name="ask" onClickHandler={askQuestion} /> : <></>}
             {phase === "ANSWER" ?  <LinkButton name="answer" onClickHandler={answerQuestion} /> : <></>}
