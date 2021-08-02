@@ -1,6 +1,6 @@
 import { Button } from '@material-ui/core';
 import React from 'react'
-import '../styles/home.css';
+import '../../styles/home.css';
 
 const LinkButton = ({ name, onClickHandler }) => {
     return (

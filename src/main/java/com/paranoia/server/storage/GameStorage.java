@@ -4,7 +4,7 @@ import com.paranoia.server.model.Game;
 
 import java.util.HashMap;
 import java.util.Map;
-
+// TODO: Use Redis to store games rather than memory.
 public class GameStorage {
 
     private static Map<String, Game> games;

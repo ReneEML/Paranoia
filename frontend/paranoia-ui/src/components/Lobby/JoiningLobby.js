@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import LinkButton from './LinkButton'
+import LinkButton from '../Shared/LinkButton'
 import { TextField } from '@material-ui/core';
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,8 +8,8 @@ import {
     createGame,
     selectLoading
 
-} from '../reducers/playerSlice';
-import { POST } from '../app/requests';
+} from '../../reducers/playerSlice';
+import { POST } from '../../app/requests';
 
 const JoiningLobby = ({ isCreate }) => {
 

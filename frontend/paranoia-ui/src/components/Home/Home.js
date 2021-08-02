@@ -1,6 +1,6 @@
 import React from 'react';
-import LinkButton from './LinkButton'
-import '../styles/home.css';
+import LinkButton from '../Shared/LinkButton'
+import '../../styles/home.css';
 import { useHistory } from "react-router";
 const Home = () => {
     const history = useHistory();

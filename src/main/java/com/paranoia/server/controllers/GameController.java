@@ -83,4 +83,13 @@ public class GameController {
         Game game = gameService.showAnswer(request.getGameId());
         simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getGameId(), game);
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @MessageMapping("/next")
+    public void next(@RequestBody ShowRequest request) throws InvalidGameException, InvalidPhaseException {
+        logger.info("Show: {}", request);
+        Game game = gameService.nextRound(request.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getGameId(), game);
+    }
+
 }

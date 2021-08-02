@@ -84,7 +84,7 @@ public class GameService {
         }
 
         game.setAnswer(answer.getAnswer());
-        game.setPhase(RoundPhase.SHOW);
+        game.setPhase(RoundPhase.COINFLIP);
 
         GameStorage.getInstance().setGame(game);
         return game;
@@ -95,14 +95,26 @@ public class GameService {
             throw new InvalidGameException("Game not found");
         }
         Game game = GameStorage.getInstance().getGames().get(gameId);
-        if(!game.getPhase().equals(RoundPhase.SHOW)) {
+        if(!game.getPhase().equals(RoundPhase.COINFLIP)) {
             throw new InvalidPhaseException("Can only answer in answer phase");
         }
-
         game.setShowAnswer(new Random().nextBoolean());
-        game.setPhase(RoundPhase.ASK);
-        game.startRound();
+        game.setPhase(RoundPhase.SHOW);
 
+        GameStorage.getInstance().setGame(game);
+        return game;
+    }
+
+    public Game nextRound(String gameId) throws InvalidGameException, InvalidPhaseException {
+        if(!GameStorage.getInstance().getGames().containsKey(gameId)) {
+            throw new InvalidGameException("Game not found");
+        }
+        Game game = GameStorage.getInstance().getGames().get(gameId);
+        if(!game.getPhase().equals(RoundPhase.SHOW)) {
+            throw new InvalidPhaseException("Can only go to next round in show phase");
+        }
+        game.startRound();
+        game.setPhase(RoundPhase.ASK);
         GameStorage.getInstance().setGame(game);
         return game;
     }

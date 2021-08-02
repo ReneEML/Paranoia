@@ -1,8 +1,8 @@
 import React from 'react';
-import Home from './Home';
-import Lobby from './Lobby';
-import JoiningLobby from './JoiningLobby';
-import GamePlay from './GamePlay';
+import Home from '../Home/Home';
+import Lobby from '../Lobby/Lobby';
+import JoiningLobby from '../Lobby/JoiningLobby';
+import GamePlay from '../Game/GamePlay';
 import {
     BrowserRouter as Router,
     Switch,
