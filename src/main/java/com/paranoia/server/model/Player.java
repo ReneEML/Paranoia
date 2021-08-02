@@ -2,22 +2,22 @@ package com.paranoia.server.model;
 
 public class Player {
 
-    private String login;
-    private PlayerType type;
+    private String playerName;
+    private PlayerType playerType;
 
-    public String getLogin() {
-        return login;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 
-    public PlayerType getType() {
-        return type;
+    public void setPlayerType(PlayerType playerType) {
+        this.playerType = playerType;
     }
 
-    public void setType(PlayerType type) {
-        this.type = type;
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 }

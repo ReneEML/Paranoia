@@ -11,11 +11,9 @@ import com.paranoia.server.service.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/game")
@@ -30,46 +28,68 @@ public class GameController {
         this.logger = LoggerFactory.getLogger(GameController.class);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/create")
     public ResponseEntity<Game> create(@RequestBody Player player){
-        logger.info("Start game request: {}", player);
+        logger.info("Create game request: {}", player);
         return ResponseEntity.ok(gameService.createGame(player));
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/connect")
     public ResponseEntity<Game> connect(@RequestBody ConnectRequest connectRequest)
             throws InvalidParamException, InvalidGameException {
         logger.info("Connect to game request: {}", connectRequest);
-        return ResponseEntity.ok(gameService.connectToGame(connectRequest.getPlayer(), connectRequest.getGameId()));
+        Game game = gameService.connectToGame(connectRequest.getPlayer(), connectRequest.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/players/" + game.getGameId(), game);
+        return ResponseEntity.ok(game);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/start")
-    public ResponseEntity<Game> start(@RequestBody StartRequest request) throws InvalidParamException {
+    public void start(@RequestBody StartRequest request) throws InvalidParamException, InvalidGameException {
         logger.info("Starting game: {}", request);
-        return ResponseEntity.ok(gameService.startGame(request.getGameId()));
+        Game game = gameService.startGame(request.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/start/" +game.getGameId(), game);
     }
 
-    @PostMapping("/ask")
-    public ResponseEntity<Game> ask(@RequestBody Question request) throws InvalidGameException, InvalidPhaseException {
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/get")
+    public ResponseEntity<Game> get(@RequestBody StartRequest request) throws InvalidParamException {
+        logger.info("Retrieving game: {}", request);
+        return ResponseEntity.ok(gameService.getGameState(request.getGameId()));
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @MessageMapping("/ask")
+    public void ask(@RequestBody Question request) throws InvalidGameException, InvalidPhaseException {
         logger.info("Ask: {}", request);
         Game game = gameService.askQuestion(request);
-        simpMessagingTemplate.convertAndSend("/topic/game-progress/" +game.getGameId(), game);
-        return ResponseEntity.ok(game);
+        simpMessagingTemplate.convertAndSend("/topic/gameplay/" +game.getGameId(), game);
     }
 
-    @PostMapping("/answer")
-    public ResponseEntity<Game> answer(@RequestBody Answer request) throws InvalidGameException, InvalidPhaseException {
+    @CrossOrigin(origins = "http://localhost:3000")
+    @MessageMapping("/answer")
+    public void answer(@RequestBody Answer request) throws InvalidGameException, InvalidPhaseException {
         logger.info("Answer: {}", request);
         Game game = gameService.answerQuestion(request);
-        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
-        return ResponseEntity.ok(game);
+        simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getGameId(), game);
     }
 
-    @PostMapping("/show")
-    public ResponseEntity<Game> show(@RequestBody ShowRequest request) throws InvalidGameException, InvalidPhaseException {
+    @CrossOrigin(origins = "http://localhost:3000")
+    @MessageMapping("/show")
+    public void show(@RequestBody ShowRequest request) throws InvalidGameException, InvalidPhaseException {
         logger.info("Show: {}", request);
         Game game = gameService.showAnswer(request.getGameId());
-        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
-        return ResponseEntity.ok(game);
+        simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getGameId(), game);
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @MessageMapping("/next")
+    public void next(@RequestBody ShowRequest request) throws InvalidGameException, InvalidPhaseException {
+        logger.info("Show: {}", request);
+        Game game = gameService.nextRound(request.getGameId());
+        simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getGameId(), game);
+    }
+
 }

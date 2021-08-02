@@ -22,7 +22,12 @@ public class GameService {
             throw new InvalidParamException("Game with provKided id:" + gameId + "dosen't exist");
         }
         Game game = GameStorage.getInstance().getGames().get(gameId);
-
+        if(game.getStatus() == GameStatus.IN_PROGRESS) {
+            throw new InvalidGameException("Game is already started");
+        }
+        if(game.getStatus() == GameStatus.FINISHED) {
+            throw new InvalidGameException("Game is finished");
+        }
         if(game.getPlayers().size() >= 15){
             throw new InvalidGameException("Game is full");
         }
@@ -31,16 +36,26 @@ public class GameService {
         return game;
     }
 
-    public Game startGame(String gameId) throws InvalidParamException {
-        if(!GameStorage.getInstance().getGames().containsKey(gameId)){
+    public Game startGame(String gameId) throws InvalidParamException, InvalidGameException {
+        if(!GameStorage.getInstance().getGames().containsKey(gameId)) {
             throw new InvalidParamException("Game with provided id:" + gameId + "dosen't exist");
         }
         Game game = GameStorage.getInstance().getGames().get(gameId);
+        if(game.getPlayers().size() < 2){
+            throw new InvalidGameException("Need at least 2 players to start the game");
+        }
         game.setStatus(GameStatus.IN_PROGRESS);
         game.setPhase(RoundPhase.ASK);
         game.startRound();
         GameStorage.getInstance().setGame(game);
         return game;
+    }
+
+    public Game getGameState(String gameId) throws InvalidParamException {
+        if(!GameStorage.getInstance().getGames().containsKey(gameId)){
+            throw new InvalidParamException("Game with provided id:" + gameId + "dosen't exist");
+        }
+        return GameStorage.getInstance().getGames().get(gameId);
     }
 
     public Game askQuestion(Question question) throws InvalidGameException, InvalidPhaseException {
@@ -69,7 +84,7 @@ public class GameService {
         }
 
         game.setAnswer(answer.getAnswer());
-        game.setPhase(RoundPhase.SHOW);
+        game.setPhase(RoundPhase.COINFLIP);
 
         GameStorage.getInstance().setGame(game);
         return game;
@@ -80,14 +95,26 @@ public class GameService {
             throw new InvalidGameException("Game not found");
         }
         Game game = GameStorage.getInstance().getGames().get(gameId);
-        if(!game.getPhase().equals(RoundPhase.SHOW)) {
+        if(!game.getPhase().equals(RoundPhase.COINFLIP)) {
             throw new InvalidPhaseException("Can only answer in answer phase");
         }
-
         game.setShowAnswer(new Random().nextBoolean());
-        game.setPhase(RoundPhase.ASK);
-        game.startRound();
+        game.setPhase(RoundPhase.SHOW);
 
+        GameStorage.getInstance().setGame(game);
+        return game;
+    }
+
+    public Game nextRound(String gameId) throws InvalidGameException, InvalidPhaseException {
+        if(!GameStorage.getInstance().getGames().containsKey(gameId)) {
+            throw new InvalidGameException("Game not found");
+        }
+        Game game = GameStorage.getInstance().getGames().get(gameId);
+        if(!game.getPhase().equals(RoundPhase.SHOW)) {
+            throw new InvalidPhaseException("Can only go to next round in show phase");
+        }
+        game.startRound();
+        game.setPhase(RoundPhase.ASK);
         GameStorage.getInstance().setGame(game);
         return game;
     }
