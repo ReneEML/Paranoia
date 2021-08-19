@@ -8,7 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../../styles/home.css';
-import { Box } from '@material-ui/core';
+import { Box, Container, Grid, makeStyles } from '@material-ui/core';
 import { useHistory } from "react-router";
 import {
     selectGameId,
@@ -20,7 +20,17 @@ import { POST } from '../../app/requests';
 import Stomp from "stompjs";
 import SockJs from 'sockjs-client';
 
+const useStyles = makeStyles({
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
+    }
+});
+
 const Lobby = () => {
+
+    const styles = useStyles();
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(true);
     const gameId = useSelector(selectGameId);
@@ -68,41 +78,53 @@ const Lobby = () => {
     }
         , [gameId])
     return (
-        <div className="homepage" >
-            <h>Name: {playerName}</h>
-            <h>GameId: {gameId}</h>
-            <Box width="50%">
-                {!isLoading ?
-                    <TableContainer component={Paper} width="600">
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center">Players</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {players.map((row) => (
+        <Container className={styles.container}>
+            <Grid
+                container
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                spacing={2}
+            >
+                <Grid item xs={12}>
+                    <h>Name: {playerName}</h>
+                    <h>GameId: {gameId}</h>
+                </Grid>
+                <Grid item xs={12}>
+                    {!isLoading ?
+                        <TableContainer component={Paper} width="600">
+                            <Table>
+                                <TableHead>
                                     <TableRow>
-                                        <TableCell align="center">{row.playerName}</TableCell>
+                                        <TableCell align="center">Players</TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    :
-                    <>
-                        Loading
-                    </>
-                }
-            </Box>
-            {players.length > 4 ? 
-                
-                <LinkButton name="start" onClickHandler={startHandler} />
-                : 
-                <h1>Waiting for at least 5 players.</h1>
-            }
-            <LinkButton name="leave" onClickHandler={leaveHandler} />
-        </div>
+                                </TableHead>
+                                <TableBody>
+                                    {players.map((row) => (
+                                        <TableRow>
+                                            <TableCell align="center">{row.playerName}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        :
+                        <>
+                            Loading
+                        </>
+                    }
+                </Grid>
+                <Grid item xs={12}>
+                    {players.length > 4 ?
+
+                        <LinkButton name="start" onClickHandler={startHandler} />
+                        :
+                        <h1>Waiting for at least 5 players.</h1>
+                    }
+                    <LinkButton name="leave" onClickHandler={leaveHandler} />
+                </Grid>
+            </Grid>
+        </Container>
     );
 }
 

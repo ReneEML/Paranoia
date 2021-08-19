@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import Stomp from "stompjs";
-import LinkButton from '../Shared/LinkButton';
+import { Container, Grid, makeStyles } from '@material-ui/core';
 import { URL } from '../../app/constants';
 import {
     selectGameId,
@@ -14,7 +14,17 @@ import Answer from './Answer';
 import Coinflip from './Coinflip';
 import Show from './Show';
 
+const useStyles = makeStyles({
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
+    }
+});
+
+
 const GamePlay = () => {
+    const styles = useStyles();
     const gameId = useSelector(selectGameId);
     const name = useSelector(selectPlayerName);
     const [stompClient, setStompClient] = useState(null);
@@ -77,7 +87,7 @@ const GamePlay = () => {
     }
 
     const answerQuestion = () => {
-        if(answerInput && answerInput !== undefined){
+        if (answerInput && answerInput !== undefined) {
             const data = {
                 answer: answerInput,
                 gameId: gameId
@@ -85,7 +95,7 @@ const GamePlay = () => {
             setAnswerInput("");
             stompClient.send("/app/answer", {}, JSON.stringify(data));
         }
-        
+
     }
 
     const coinFlip = () => {
@@ -107,55 +117,72 @@ const GamePlay = () => {
     const handleAnswerInput = (e) => setAnswerInput(e.target.value);
 
     return (
-        <div>
-            <p>Game: {gameId}</p>
-            <p>Username: {name}</p>
-            {phase === "ASK" ?
-                <Ask
-                    asker={asker}
-                    name={name}
-                    questioned={questioned}
-                    questionInput={questionInput}
-                    handleQuestionInput={handleQuestionInput}
-                    askQuestionHandler={askQuestion}
-                />
-                : <></>
-            }
-            {phase === "ANSWER" ? 
-                <Answer 
-                    asker={asker}
-                    name={name}
-                    questioned={questioned}
-                    answerInput={answerInput}
-                    handleAnswerInput={handleAnswerInput}
-                    answerQuestionHandler={answerQuestion}
-                    players={players}
-                    question={question}
-                />
-             : <></>}
-            {phase === "COINFLIP" ? 
-                <Coinflip 
-                    name={name}
-                    questioned={questioned}
-                    question={question}
-                    answer={answer}
-                    coinFlipHandler={coinFlip}
-                />
-            
-            : <></>
-            }
-            {phase === "SHOW" ? 
-                <Show 
-                    showQuestion={show}
-                    question={question}
-                    answer={answer}
-                    asker={asker}
-                    questioned={questioned}
-                    nextRoundHandler={nextRound}
-                />
-                :<></>
-            }
-        </div>
+        <Container className={styles.container}>
+
+
+            <Grid
+                container
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                spacing={2}
+            >
+                <Grid item xs={12}>
+                    <p>Game: {gameId}</p>
+                    <p>Username: {name}</p>
+                </Grid>
+                {
+                    phase === "ASK" ?
+                        <Ask
+                            asker={asker}
+                            name={name}
+                            questioned={questioned}
+                            questionInput={questionInput}
+                            handleQuestionInput={handleQuestionInput}
+                            askQuestionHandler={askQuestion}
+                        />
+                        : <></>
+                }
+                {
+                    phase === "ANSWER" ?
+                        <Answer
+                            asker={asker}
+                            name={name}
+                            questioned={questioned}
+                            answerInput={answerInput}
+                            handleAnswerInput={handleAnswerInput}
+                            answerQuestionHandler={answerQuestion}
+                            players={players}
+                            question={question}
+                        />
+                        : <></>
+                }
+                {
+                    phase === "COINFLIP" ?
+                        <Coinflip
+                            name={name}
+                            questioned={questioned}
+                            question={question}
+                            answer={answer}
+                            coinFlipHandler={coinFlip}
+                        />
+
+                        : <></>
+                }
+                {
+                    phase === "SHOW" ?
+                        <Show
+                            showQuestion={show}
+                            question={question}
+                            answer={answer}
+                            asker={asker}
+                            questioned={questioned}
+                            nextRoundHandler={nextRound}
+                        />
+                        : <></>
+                }
+            </Grid>
+        </Container>
     );
 }
 

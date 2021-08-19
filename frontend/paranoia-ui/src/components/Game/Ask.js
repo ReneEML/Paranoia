@@ -1,20 +1,29 @@
-import { TextField } from '@material-ui/core';
+import { TextField, Grid } from '@material-ui/core';
 import LinkButton from '../Shared/LinkButton';
 import React from 'react'
 
-const Ask = ({asker, name, questioned, questionInput, handleQuestionInput, askQuestionHandler}) => {
+const Ask = ({ asker, name, questioned, questionInput, handleQuestionInput, askQuestionHandler }) => {
     return (
-        <div>
-            {asker === name ? 
-                <div>
-                    <h1>Ask {questioned} a question:</h1>
-                    <TextField id="standard-basic" label="Standard" value={questionInput} onChange={handleQuestionInput}/>
-                    <LinkButton name="ask" onClickHandler={askQuestionHandler} />
-                </div>
-                 : 
-                 <h1>Waiting for {asker} to ask {questioned} a question.</h1>
+        <>
+            {asker === name ?
+                <>
+                    <Grid item xs={12}>
+                        <h1>Ask {questioned} a question:</h1>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField id="standard-basic" label="Standard" value={questionInput} onChange={handleQuestionInput} />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <LinkButton name="ask" onClickHandler={askQuestionHandler} />
+                    </Grid>
+                </>
+                :
+                <Grid item xs={12}>
+                    <h1>Waiting for {asker} to ask {questioned} a question.</h1>
+                </Grid>
+                
             }
-        </div>
+        </>
     );
 }
 
