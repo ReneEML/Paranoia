@@ -1,13 +1,12 @@
 import { Button } from '@material-ui/core';
 import React from 'react'
-import '../../styles/home.css';
 
 const LinkButton = ({ name, onClickHandler }) => {
     return (
         <Button
             onClick={() => onClickHandler()}
-            variant="contained"
-            id="homebutton"
+            size="large"
+            style={{color:'white'}}
         >
             {name}
 
