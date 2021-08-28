@@ -1,5 +1,6 @@
 import { TextField, Grid } from '@material-ui/core';
 import LinkButton from '../Shared/LinkButton';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import React from 'react'
 
 const Ask = ({ asker, name, questioned, questionInput, handleQuestionInput, askQuestionHandler }) => {
@@ -20,6 +21,7 @@ const Ask = ({ asker, name, questioned, questionInput, handleQuestionInput, askQ
                 :
                 <Grid item xs={12}>
                     <h1>Waiting for {asker} to ask {questioned} a question.</h1>
+                    <CircularProgress />
                 </Grid>
                 
             }

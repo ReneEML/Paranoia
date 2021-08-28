@@ -11,18 +11,8 @@ import {
 } from '../../reducers/playerSlice';
 import { POST } from '../../app/requests';
 import { makeStyles } from '@material-ui/core/styles';
-
+import useStyles from '../../styles/Styles';
 import Header from '../Shared/Header';
-
-
-const useStyles = makeStyles({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        display: 'flex',
-    }
-});
-
 
 const JoiningLobby = ({ isCreate }) => {
     const styles = useStyles();
@@ -69,35 +59,34 @@ const JoiningLobby = ({ isCreate }) => {
                 >
                     <Grid item xs={12}>
                         {isCreate ?
-                            <h1>Creating Game</h1> :
-                            <h1>Joining Game</h1>
+                            <h1>Create Game</h1> :
+                            <h1>Join Game</h1>
                         }
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
+                            
                             label="Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             variant='outlined'
                         />
-
                     </Grid>
-                    <Grid item xs={12} sm={6} direction="row"
-                        justifyContent="center"
-                        alignItems="flex-start">
-
-                        {!isCreate ?
+                    {!isCreate ?
+                        <Grid item xs={12} sm={6}
+                            justifyContent="center"
+                            alignItems="flex-start">
                             <TextField
+                                color="primary"
                                 label="Game ID"
                                 value={gameId}
                                 onChange={(e) => setGameId(e.target.value)}
                                 variant='outlined'
                             />
-                            :
-                            <> </>
-                        }
-
-                    </Grid>
+                        </Grid>
+                        :
+                        <> </>
+                    }
                     <Grid item xs={12} direction="row"
                         justifyContent="center"
                         alignItems="flex-start">

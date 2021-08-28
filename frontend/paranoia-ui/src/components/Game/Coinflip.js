@@ -1,4 +1,5 @@
 import { Grid } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import LinkButton from '../Shared/LinkButton';
 import React from 'react'
 
@@ -18,7 +19,13 @@ const Coinflip = ({ name, questioned, question, answer, coinFlipHandler }) => {
 
                 </>
                 :
-                <h1>{questioned} answered: {answer}</h1>
+                <>
+
+                    <Grid item xs={12}>
+                        <h1>{questioned} answered: {answer}</h1>
+                        <CircularProgress />
+                    </Grid>
+                </>
             }
         </>
     );

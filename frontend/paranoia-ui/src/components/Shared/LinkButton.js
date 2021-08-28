@@ -5,9 +5,8 @@ const LinkButton = ({ name, onClickHandler }) => {
     return (
         <Button
             onClick={() => onClickHandler()}
-            color="primary"
-            variant="contained"
             size="large"
+            style={{color:'white'}}
         >
             {name}
 

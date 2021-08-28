@@ -1,5 +1,6 @@
 import { MenuItem, TextField, Grid } from '@material-ui/core';
 import LinkButton from '../Shared/LinkButton';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import React from 'react'
 
 const Answer = ({ asker, name, questioned, question, answerInput, handleAnswerInput, answerQuestionHandler, players }) => {
@@ -33,7 +34,13 @@ const Answer = ({ asker, name, questioned, question, answerInput, handleAnswerIn
                     </Grid>
                 </>
                 :
-                <h1>Waiting for {questioned} to answer {asker}'s question.</h1>
+                <>
+                    <Grid item xs={12}>
+                        <h1>Waiting for {questioned} to answer {asker}'s question.</h1>
+                        <CircularProgress />
+                    </Grid>
+                    
+                </>
             }
         </>
     );
