@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import LinkButton from '../Shared/LinkButton'
-import { TextField, Container, Grid } from '@material-ui/core';
+import CustomTextField from '../Shared/CustomTextField';
+import { Container, Grid } from '@material-ui/core';
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -9,10 +10,7 @@ import {
     selectLoading
 
 } from '../../reducers/playerSlice';
-import { POST } from '../../app/requests';
-import { makeStyles } from '@material-ui/core/styles';
 import useStyles from '../../styles/Styles';
-import Header from '../Shared/Header';
 
 const JoiningLobby = ({ isCreate }) => {
     const styles = useStyles();
@@ -21,6 +19,14 @@ const JoiningLobby = ({ isCreate }) => {
     const [name, setName] = useState("");
     const [gameId, setGameId] = useState("");
     const loading = useSelector(selectLoading);
+
+    const handleNameChange = (val) => {
+        setName(val);
+    }
+
+    const handleGameIdChange = (val) => {
+        setGameId(val);
+    }
 
     const handleCreate = async () => {
         const data = {
@@ -59,37 +65,30 @@ const JoiningLobby = ({ isCreate }) => {
                 >
                     <Grid item xs={12}>
                         {isCreate ?
-                            <h1>Create Game</h1> :
-                            <h1>Join Game</h1>
+                            <h1>Create Room</h1> :
+                            <h1>Join Room</h1>
                         }
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <TextField
-                            
+                        <CustomTextField
                             label="Name"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            variant='outlined'
+                            onChangeHandler={handleNameChange}
                         />
                     </Grid>
                     {!isCreate ?
-                        <Grid item xs={12} sm={6}
-                            justifyContent="center"
-                            alignItems="flex-start">
-                            <TextField
-                                color="primary"
-                                label="Game ID"
+                        <Grid item xs={12} sm={6}>
+                            <CustomTextField
+                                label="Game Id"
                                 value={gameId}
-                                onChange={(e) => setGameId(e.target.value)}
-                                variant='outlined'
+                                onChangeHandler={handleGameIdChange}
                             />
                         </Grid>
                         :
                         <> </>
                     }
-                    <Grid item xs={12} direction="row"
-                        justifyContent="center"
-                        alignItems="flex-start">
+                    <Grid item xs={12} 
+                        >
 
                         {isCreate ?
                             <LinkButton name="Create" onClickHandler={handleCreate} />

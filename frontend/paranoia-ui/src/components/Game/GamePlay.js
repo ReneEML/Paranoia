@@ -13,15 +13,7 @@ import Ask from './Ask';
 import Answer from './Answer';
 import Coinflip from './Coinflip';
 import Show from './Show';
-
-const useStyles = makeStyles({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        display: 'flex',
-    }
-});
-
+import useStyles from '../../styles/Styles'
 
 const GamePlay = () => {
     const styles = useStyles();
@@ -112,7 +104,7 @@ const GamePlay = () => {
         stompClient.send("/app/next", {}, JSON.stringify(data))
     }
 
-    const handleQuestionInput = (e) => setQuestionInput(e.target.value);
+    const handleQuestionInput = (val) => setQuestionInput(val);
 
     const handleAnswerInput = (e) => setAnswerInput(e.target.value);
 

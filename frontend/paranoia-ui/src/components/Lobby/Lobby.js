@@ -19,14 +19,7 @@ import { useSelector } from 'react-redux';
 import { POST } from '../../app/requests';
 import Stomp from "stompjs";
 import SockJs from 'sockjs-client';
-
-const useStyles = makeStyles({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        display: 'flex',
-    }
-});
+import useStyles from '../../styles/Styles'
 
 const Lobby = () => {
 
@@ -88,6 +81,8 @@ const Lobby = () => {
             >
                 <Grid item xs={12}>
                     <h>Name: {playerName}</h>
+                </Grid>
+                <Grid item xs={12}>
                     <h>GameId: {gameId}</h>
                 </Grid>
                 <Grid item xs={12}>

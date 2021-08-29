@@ -27,7 +27,7 @@ const Home = () => {
                 height
             >
                 <Grid item xs={12}>
-                    <h1 className={styles.title}>PARANOIA...</h1>
+                    <h1 className={styles.title}>PARANOIA</h1>
                 </Grid>
                 <Grid item xs={12}>
                     <LinkButton name="Create Room" onClickHandler={createHandler} />
